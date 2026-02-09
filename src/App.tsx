@@ -91,7 +91,7 @@ function App() {
 
   return (
     <div className="h-screen bg-gray-900 text-white flex flex-col overflow-hidden">
-      <header className="bg-gray-800 px-6 py-2 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
+      <header className="bg-gray-800 px-2 py-2 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
         <div className="flex items-baseline gap-8">
           <h1 className="text-lg font-bold">gcoordinator-web (beta)</h1>
           <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ function App() {
           style={{ width: `${100 - leftWidth}%` }}
           className="relative bg-gray-950 min-h-0 overflow-hidden"
         >
-          <div className="flex items-center gap-2 px-3 py-1 bg-gray-800 border-b border-gray-700">
+          <div className="flex items-center gap-2 px-2 py-1 bg-gray-800 border-b border-gray-700">
             <div className="flex gap-2 ml-auto">
               <button
                 type="button"

@@ -49,7 +49,7 @@ function CodeEditor({ code, onChange }: CodeEditorProps) {
 
   return (
     <div className="h-full flex flex-col bg-gray-900 border border-gray-800 rounded-md overflow-hidden">
-      <div className="flex items-center gap-2 px-3 py-1 bg-gray-800 border-b border-gray-700">
+      <div className="flex items-center gap-2 px-2 py-1 bg-gray-800 border-b border-gray-700">
         <select
           onChange={handleExampleChange}
           value={selectedExample}
@@ -65,14 +65,14 @@ function CodeEditor({ code, onChange }: CodeEditorProps) {
           <button
             type="button"
             onClick={handleCopy}
-            className="px-2 py-0.5 text-sm rounded-md border-1 border-gray-100 text-gray-100 hover:bg-gray-500 hover:text-white transition-colors"
+            className="px-2 py-0.5 text-sm border border-gray-600 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition-colors"
           >
             Copy
           </button>
           <button
             type="button"
             onClick={handlePaste}
-            className="px-2 py-0.5 text-sm rounded-md border-1 border-gray-100 text-gray-100 hover:bg-gray-500 hover:text-white transition-colors"
+            className="px-2 py-0.5 text-sm border border-gray-600 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition-colors"
           >
             Paste
           </button>
