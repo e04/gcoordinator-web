@@ -30,7 +30,7 @@ async function initPyodide(): Promise<PyodideInterface> {
   await pyodide.loadPackage("numpy");
 
   const micropip = pyodide.pyimport("micropip");
-  await micropip.install("/gcoordinator-0.0.1-py3-none-any.whl");
+  await micropip.install("/gcoordinator-web/gcoordinator-0.0.1-py3-none-any.whl");
 
   pyodideInstance = pyodide;
   return pyodide;
