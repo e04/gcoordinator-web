@@ -1,13 +1,13 @@
 export const EXAMPLE_PATHS = {
-  rectangle_wall: "/example/rectangle_wall.py",
-  cylinder_wall: "/example/cylinder_wall.py",
-  cylinder: "/example/cylinder.py",
-  dish: "/example/dish.py",
-  box: "/example/box.py",
-  vase1: "/example/vase1.py",
-  vase2: "/example/vase2.py",
-  vase3: "/example/vase3.py",
-  vase4: "/example/vase4.py",
+  rectangle_wall: "/gcoordinator-web/example/rectangle_wall.py",
+  cylinder_wall: "/gcoordinator-web/example/cylinder_wall.py",
+  cylinder: "/gcoordinator-web/example/cylinder.py",
+  dish: "/gcoordinator-web/example/dish.py",
+  box: "/gcoordinator-web/example/box.py",
+  vase1: "/gcoordinator-web/example/vase1.py",
+  vase2: "/gcoordinator-web/example/vase2.py",
+  vase3: "/gcoordinator-web/example/vase3.py",
+  vase4: "/gcoordinator-web/example/vase4.py",
 } as const;
 
 export type ExampleKey = keyof typeof EXAMPLE_PATHS;
