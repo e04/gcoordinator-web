@@ -50,46 +50,6 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 , a Python library created by <strong>tomohiron907</strong>.
               </p>
             </section>
-
-            <section className="space-y-3">
-              <h3 className="text-lg font-semibold text-white mb-2">License</h3>
-              <p>
-                <strong>gcoordinator</strong> © 2023 tomohiron907{" "}
-                <a
-                  href="https://opensource.org/licenses/MIT"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 underline"
-                >
-                  MIT License
-                </a>
-                .
-              </p>
-              <p>
-                <strong>gcoordinator-lite</strong> © 2026 e04{" "}
-                <a
-                  href="https://github.com/e04/gcoordinator-lite"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 underline"
-                >
-                  MIT License
-                </a>
-                .
-              </p>
-              <p>
-                <strong>gcoordinator-web</strong> © 2026 e04{" "}
-                <a
-                  href="https://opensource.org/licenses/MIT"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 underline"
-                >
-                  MIT License
-                </a>
-                .
-              </p>
-            </section>
           </div>
         </div>
       </div>

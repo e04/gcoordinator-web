@@ -16,7 +16,7 @@ import {
 const LINE_HEIGHT = 20; // pixels per line
 const OVERSCAN = 32; // extra rows to render above/below viewport
 
-function OutputDisplay() {
+function GCodeTextViewer() {
   const gcode = useSyncExternalStore(subscribe, getGcodeSnapshot);
   const selectedLine = useSyncExternalStore(subscribe, getSelectedLineSnapshot);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +67,9 @@ function OutputDisplay() {
     const items = [];
     for (let i = startIndex; i <= endIndex; i++) {
       const line = lines[i];
-      const className = `cursor-pointer hover:bg-gray-700 ${
+      const className = `cursor-pointer ${
+        selectedLine === i ? "hover:bg-yellow-900" : "hover:bg-gray-700"
+      } ${
         selectedLine === i
           ? "bg-yellow-700 text-white"
           : selectedLine !== null && i < selectedLine
@@ -89,6 +91,8 @@ function OutputDisplay() {
             left: 0,
             right: 0,
             paddingLeft: "8px",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
           }}
         >
           {line || "\u00A0"}
@@ -111,4 +115,4 @@ function OutputDisplay() {
   );
 }
 
-export default OutputDisplay;
+export default GCodeTextViewer;

@@ -3,47 +3,25 @@ import gcoordinator as gc
 
 default_settings = {
     "Print": {
-        "nozzle": {
-            "nozzle_diameter": 1.2,
-            "filament_diameter": 1.75
-        },
-        "layer": {
-            "layer_height": 1.0
-        },
-        "speed": {
-            "print_speed": 1000,
-            "travel_speed": 5000
-        },
-        "origin": {
-            "x": 90,
-            "y": 90
-        },
-        "fan_speed": {
-            "fan_speed": 0
-        },
-        "temperature": {
-            "nozzle_temperature": 250,
-            "bed_temperature": 75
-        },
+        "nozzle": {"nozzle_diameter": 1.2, "filament_diameter": 1.75},
+        "layer": {"layer_height": 1.0},
+        "speed": {"print_speed": 1000, "travel_speed": 5000},
+        "origin": {"x": 90, "y": 90},
+        "fan_speed": {"fan_speed": 0},
+        "temperature": {"nozzle_temperature": 250, "bed_temperature": 75},
         "travel_option": {
             "retraction": False,
             "retraction_distance": 2.0,
             "unretraction_distance": 2.0,
             "z_hop": False,
-            "z_hop_distance": 3
+            "z_hop_distance": 3,
         },
-        "extrusion_option": {
-            "extrusion_multiplier": 1.0
-        }
+        "extrusion_option": {"extrusion_multiplier": 1.0},
     },
     "Hardware": {
         "kinematics": "Cartesian",
-        "bed_size": {
-            "bed_size_x": 180,
-            "bed_size_y": 180,
-            "bed_size_z": 180
-        }
-    }
+        "bed_size": {"bed_size_x": 180, "bed_size_y": 180, "bed_size_z": 180},
+    },
 }
 
 gc.set_settings(default_settings)
@@ -61,16 +39,21 @@ WALL_POINTS_PER_SIDE = 2
 SKIRT_OFFSET = 5
 SKIRT_POINTS = 200
 
+
 def calculate_size_at_layer(layer: float) -> tuple:
     progress = layer / TOTAL_LAYERS
     width = BASE_WIDTH + (LAST_WIDTH - BASE_WIDTH) * progress
     depth = BASE_DEPTH + (LAST_DEPTH - BASE_DEPTH) * progress
     return width, depth
 
+
 def calculate_wall_start_size() -> tuple:
     return calculate_size_at_layer(BOTTOM_LAYERS)
 
-def create_rect_path(width: float, depth: float, z_height: float, points_per_side: int) -> tuple:
+
+def create_rect_path(
+    width: float, depth: float, z_height: float, points_per_side: int
+) -> tuple:
     x_list = []
     y_list = []
     x_list.append(np.full(points_per_side, width))
@@ -86,6 +69,7 @@ def create_rect_path(width: float, depth: float, z_height: float, points_per_sid
     z = np.full_like(x, z_height)
     return x, y, z
 
+
 def create_skirt_path() -> gc.Path:
     width, depth = calculate_wall_start_size()
     width += SKIRT_OFFSET
@@ -93,6 +77,7 @@ def create_skirt_path() -> gc.Path:
     points_per_side = SKIRT_POINTS // 4
     x, y, z = create_rect_path(width, depth, LAYER_HEIGHT, points_per_side)
     return gc.Path(x, y, z)
+
 
 def create_zigzag_bottom() -> gc.Path:
     max_width, max_depth = calculate_wall_start_size()
@@ -115,6 +100,7 @@ def create_zigzag_bottom() -> gc.Path:
     y = np.array(y_list)
     z = np.full_like(x, LAYER_HEIGHT)
     return gc.Path(x, y, z)
+
 
 def create_continuous_wall() -> gc.Path:
     wall_layers = TOTAL_LAYERS - BOTTOM_LAYERS
@@ -154,6 +140,7 @@ def create_continuous_wall() -> gc.Path:
     y = np.concatenate(y_list)
     z = np.concatenate(z_list)
     return gc.Path(x, y, z)
+
 
 full_object = []
 skirt = create_skirt_path()

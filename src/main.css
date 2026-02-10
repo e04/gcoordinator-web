@@ -22,3 +22,61 @@
 	height: 16px;
     scrollbar-width: thin;
 }
+
+.code-editor-container {
+	container-type: inline-size;
+}
+
+@container (max-width: 700px) {
+	.code-editor-container .monaco-editor .margin,
+	.code-editor-container .monaco-editor .margin-view-overlays,
+	.code-editor-container .monaco-editor .glyph-margin {
+		width: 30px !important;
+	}
+
+	.code-editor-container .monaco-editor .line-numbers {
+		width: 24px !important;
+		left: 0 !important;
+	}
+
+	.code-editor-container .monaco-editor .monaco-scrollable-element {
+		left: 30px !important;
+		width: calc(100% - 30px) !important;
+	}
+}
+
+@media (max-width: 768px) {
+	.app-main-panels {
+		flex-direction: column;
+		overflow-y: auto;
+		overscroll-behavior-y: contain;
+	}
+
+	.app-left-panel,
+	.app-right-panel {
+		width: 100% !important;
+	}
+
+	.app-left-panel {
+		min-height: clamp(320px, 52vh, 560px);
+	}
+
+	.app-right-panel {
+		min-height: clamp(340px, 55vh, 640px);
+		border-top: 1px solid #374151;
+	}
+
+	.app-horizontal-resize-handle,
+	.app-console-resize-handle,
+	.app-output-resize-handle {
+		display: none;
+	}
+
+	.app-console-output {
+		height: 72px !important;
+	}
+
+	.app-output-overlay {
+		height: 100px !important;
+	}
+}

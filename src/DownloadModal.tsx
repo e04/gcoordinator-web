@@ -61,12 +61,15 @@ function DownloadModal({ isOpen, onClose, gcode }: DownloadModalProps) {
 
   return (
     <div
-      className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4"
       onClick={handleBackdropClick}
     >
       <div className="w-full max-w-2xl rounded-md border border-gray-700 bg-gray-900 p-4 shadow-xl">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-100">Download G-code</h2>          <button
+          <h2 className="text-sm font-semibold text-gray-100">
+            Download G-code
+          </h2>{" "}
+          <button
             type="button"
             onClick={onClose}
             className="text-2xl leading-none text-gray-400 hover:text-white"
@@ -86,27 +89,28 @@ function DownloadModal({ isOpen, onClose, gcode }: DownloadModalProps) {
               className="w-full rounded-md border border-gray-600 bg-gray-800 px-2 py-1 font-mono text-sm text-gray-100 transition-colors placeholder:text-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
-
           <div className="space-y-1">
-            <label className="text-xs text-gray-300">Start G-code</label>
-            <textarea
-              value={startGCode}
-              onChange={(e) => setStartGCode(e.target.value)}
-              onBlur={handleStartBlur}
-              placeholder="Enter G-code to prepend at the start..."
-              className="h-32 w-full resize-none rounded-md border border-gray-600 bg-gray-800 px-2 py-1 font-mono text-sm text-gray-100 transition-colors placeholder:text-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
+            <div className="space-y-1">
+              <label className="text-xs text-gray-300">Start G-code</label>
+              <textarea
+                value={startGCode}
+                onChange={(e) => setStartGCode(e.target.value)}
+                onBlur={handleStartBlur}
+                placeholder="Enter G-code to prepend at the start..."
+                className="h-32 w-full resize-none rounded-md border border-gray-600 bg-gray-800 px-2 py-1 font-mono text-sm text-gray-100 transition-colors placeholder:text-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
 
-          <div className="space-y-1">
-            <label className="text-xs text-gray-300">End G-code</label>
-            <textarea
-              value={endGCode}
-              onChange={(e) => setEndGCode(e.target.value)}
-              onBlur={handleEndBlur}
-              placeholder="Enter G-code to append at the end..."
-              className="h-32 w-full resize-none rounded-md border border-gray-600 bg-gray-800 px-2 py-1 font-mono text-sm text-gray-100 transition-colors placeholder:text-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
+            <div className="space-y-1">
+              <label className="text-xs text-gray-300">End G-code</label>
+              <textarea
+                value={endGCode}
+                onChange={(e) => setEndGCode(e.target.value)}
+                onBlur={handleEndBlur}
+                placeholder="Enter G-code to append at the end..."
+                className="h-32 w-full resize-none rounded-md border border-gray-600 bg-gray-800 px-2 py-1 font-mono text-sm text-gray-100 transition-colors placeholder:text-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           <div className="rounded-md border border-red-700 bg-red-950/40 p-3">

@@ -142,7 +142,7 @@ function createAxesHelper(size: number): THREE.Group {
   return group;
 }
 
-function GCodeViewer() {
+function GCode3DViewer() {
   const gcode = useSyncExternalStore(subscribe, getGcodeSnapshot);
   const selectedLine = useSyncExternalStore(subscribe, getSelectedLineSnapshot);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -393,4 +393,4 @@ function GCodeViewer() {
   );
 }
 
-export default GCodeViewer;
+export default GCode3DViewer;

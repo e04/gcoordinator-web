@@ -17,20 +17,29 @@ WALL_POINTS_PER_LAYER = 720
 SKIRT_OFFSET = 5
 SKIRT_POINTS = 200
 
+
 def calculate_radius_at_layer(layer: float) -> float:
     progress = layer / TOTAL_LAYERS
     return BASE_RADIUS + (LAST_RADIUS - BASE_RADIUS) * progress
 
+
 def calculate_wall_start_radius() -> float:
     return calculate_radius_at_layer(BOTTOM_LAYERS)
 
+
 def create_skirt_path() -> gc.Path:
     angles = np.linspace(0, 2 * np.pi, SKIRT_POINTS)
-    radius = calculate_wall_start_radius() + WAVE_AMPLITUDE + LOW_FREQ_AMPLITUDE + SKIRT_OFFSET
+    radius = (
+        calculate_wall_start_radius()
+        + WAVE_AMPLITUDE
+        + LOW_FREQ_AMPLITUDE
+        + SKIRT_OFFSET
+    )
     x = radius * np.cos(angles)
     y = radius * np.sin(angles)
     z = np.full_like(angles, LAYER_HEIGHT)
     return gc.Path(x, y, z)
+
 
 def create_spiral_bottom() -> gc.Path:
     base_radius = calculate_wall_start_radius()
@@ -44,17 +53,20 @@ def create_spiral_bottom() -> gc.Path:
     angle_position = theta % (2 * np.pi)
     low_freq_angle = angle_position * LOW_FREQ_FREQUENCY
     low_freq_wave = LOW_FREQ_AMPLITUDE * np.sin(low_freq_angle) * wave_strength
-    actual_radius = r_base  + low_freq_wave
+    actual_radius = r_base + low_freq_wave
     x = actual_radius * np.cos(theta)
     y = actual_radius * np.sin(theta)
     z = np.full_like(theta, LAYER_HEIGHT)
     return gc.Path(x, y, z)
 
+
 def create_continuous_wave_wall() -> gc.Path:
     wall_layers = TOTAL_LAYERS - BOTTOM_LAYERS
     total_points = WALL_POINTS_PER_LAYER * wall_layers
     theta = np.linspace(0, 2 * np.pi * wall_layers, total_points)
-    z = np.linspace(BOTTOM_LAYERS * LAYER_HEIGHT, TOTAL_LAYERS * LAYER_HEIGHT, total_points)
+    z = np.linspace(
+        BOTTOM_LAYERS * LAYER_HEIGHT, TOTAL_LAYERS * LAYER_HEIGHT, total_points
+    )
     layer_progress = np.linspace(BOTTOM_LAYERS, TOTAL_LAYERS, total_points)
     expanding_radius = calculate_radius_at_layer(layer_progress)
     phase_cycle = (layer_progress - BOTTOM_LAYERS) / PHASE_INVERSION_LAYERS
@@ -67,6 +79,7 @@ def create_continuous_wave_wall() -> gc.Path:
     x = radius * np.cos(theta)
     y = radius * np.sin(theta)
     return gc.Path(x, y, z)
+
 
 full_object = []
 skirt = create_skirt_path()

@@ -3,7 +3,15 @@ import Editor from "@monaco-editor/react";
 import { DEFAULT_EXAMPLE, loadExampleCode } from "./examples";
 import type { ExampleKey } from "./examples";
 import LoadCodeModal from "./LoadCodeModal";
-import { ClipboardPaste, Copy, Download, FolderOpen } from "lucide-react";
+import {
+  ClipboardPaste,
+  Copy,
+  Download,
+  FolderOpen,
+  WandSparkles,
+} from "lucide-react";
+import { formatPythonWithRuff } from "./ruffFormatter";
+import IconButtonWithTooltip from "./IconButtonWithTooltip";
 
 interface CodeEditorProps {
   code: string;
@@ -15,6 +23,7 @@ function CodeEditor({ code, onChange }: CodeEditorProps) {
     useState<ExampleKey>(DEFAULT_EXAMPLE);
   const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
   const [isDragActive, setIsDragActive] = useState(false);
+  const [isFormatting, setIsFormatting] = useState(false);
 
   const handleExampleChange = async (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -92,50 +101,89 @@ function CodeEditor({ code, onChange }: CodeEditorProps) {
     }
   };
 
+  const handleFormat = async () => {
+    if (isFormatting) {
+      return;
+    }
+
+    setIsFormatting(true);
+    try {
+      const formatted = await formatPythonWithRuff(code);
+      if (formatted !== code) {
+        onChange(formatted);
+      }
+    } catch (err) {
+      console.error("Failed to format code with Ruff", err);
+    } finally {
+      setIsFormatting(false);
+    }
+  };
+
   return (
-    <div className="relative h-full flex flex-col bg-gray-900 border border-gray-800 rounded-md overflow-hidden">
+    <div className="code-editor-container relative h-full flex flex-col bg-gray-900 border border-gray-800 rounded-md overflow-hidden">
       <div className="flex items-center gap-2 px-2 py-1 bg-gray-800 border-b border-gray-700">
-        <button
-          type="button"
-          onClick={() => setIsLoadModalOpen(true)}
-          aria-label="Load code"
-          title="Load code"
-          className="p-1.5 border border-blue-500/60 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors inline-flex items-center justify-center"
-        >
-          <FolderOpen className="h-4 w-4" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          onClick={handleDownload}
-          aria-label="Save code"
-          title="Save code"
-          className="p-1.5 border border-emerald-500/60 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white transition-colors inline-flex items-center justify-center"
-        >
-          <Download className="h-4 w-4" aria-hidden="true" />
-        </button>
+        <IconButtonWithTooltip tooltip="Load code">
+          <button
+            type="button"
+            onClick={() => setIsLoadModalOpen(true)}
+            aria-label="Load code"
+            className="p-1.5 border border-blue-500/60 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors inline-flex items-center justify-center"
+          >
+            <FolderOpen className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </IconButtonWithTooltip>
+        <IconButtonWithTooltip tooltip="Save code">
+          <button
+            type="button"
+            onClick={handleDownload}
+            aria-label="Save code"
+            className="p-1.5 border border-emerald-500/60 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white transition-colors inline-flex items-center justify-center"
+          >
+            <Download className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </IconButtonWithTooltip>
         <div className="flex gap-2 ml-auto">
-          <button
-            type="button"
-            onClick={handleCopy}
-            aria-label="Copy code"
-            title="Copy code"
-            className="p-1.5 border border-indigo-500/60 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition-colors inline-flex items-center justify-center"
+          <IconButtonWithTooltip
+            tooltip={isFormatting ? "Formatting code..." : "Format code"}
           >
-            <Copy className="h-4 w-4" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={handlePaste}
-            aria-label="Paste code"
-            title="Paste code"
-            className="p-1.5 border border-violet-500/60 rounded-md bg-violet-600 hover:bg-violet-500 text-white transition-colors inline-flex items-center justify-center"
-          >
-            <ClipboardPaste className="h-4 w-4" aria-hidden="true" />
-          </button>
+            <button
+              type="button"
+              onClick={handleFormat}
+              disabled={isFormatting}
+              aria-label={isFormatting ? "Formatting code..." : "Format code"}
+              className={`p-1.5 border rounded-md text-white transition-colors inline-flex items-center justify-center ${
+                isFormatting
+                  ? "border-cyan-500/40 bg-cyan-700/70 cursor-wait"
+                  : "border-cyan-500/60 bg-cyan-600 hover:bg-cyan-500"
+              }`}
+            >
+              <WandSparkles className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </IconButtonWithTooltip>
+          <IconButtonWithTooltip tooltip="Copy code">
+            <button
+              type="button"
+              onClick={handleCopy}
+              aria-label="Copy code"
+              className="p-1.5 border border-indigo-500/60 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition-colors inline-flex items-center justify-center"
+            >
+              <Copy className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </IconButtonWithTooltip>
+          <IconButtonWithTooltip tooltip="Paste code">
+            <button
+              type="button"
+              onClick={handlePaste}
+              aria-label="Paste code"
+              className="p-1.5 border border-violet-500/60 rounded-md bg-violet-600 hover:bg-violet-500 text-white transition-colors inline-flex items-center justify-center"
+            >
+              <ClipboardPaste className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </IconButtonWithTooltip>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
+      <div className="code-editor-host flex-1 min-h-0">
         <Editor
           height="100%"
           language="python"
@@ -147,6 +195,8 @@ function CodeEditor({ code, onChange }: CodeEditorProps) {
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             automaticLayout: true,
+            lineNumbers: "on",
+            lineNumbersMinChars: 3,
             tabSize: 4,
             insertSpaces: true,
           }}

@@ -14,9 +14,11 @@ WALL_POINTS_PER_LAYER = 720
 SKIRT_OFFSET = 5
 SKIRT_POINTS = 200
 
+
 def calculate_radius_at_layer(layer: float) -> float:
     progress = layer / TOTAL_LAYERS
     return BASE_RADIUS + (LAST_RADIUS - BASE_RADIUS) * progress
+
 
 def create_skirt_path() -> gc.Path:
     angles = np.linspace(0, 2 * np.pi, SKIRT_POINTS)
@@ -25,6 +27,7 @@ def create_skirt_path() -> gc.Path:
     y = radius * np.sin(angles)
     z = np.full_like(angles, LAYER_HEIGHT)
     return gc.Path(x, y, z)
+
 
 def create_spiral_bottom() -> gc.Path:
     max_radius = calculate_radius_at_layer(1) + WAVE_AMPLITUDE
@@ -36,6 +39,7 @@ def create_spiral_bottom() -> gc.Path:
     y = r * np.sin(theta)
     z = np.full_like(theta, LAYER_HEIGHT)
     return gc.Path(x, y, z)
+
 
 def create_continuous_wave_wall() -> gc.Path:
     wall_layers = TOTAL_LAYERS - 1
@@ -49,6 +53,7 @@ def create_continuous_wave_wall() -> gc.Path:
     x = radius * np.cos(theta)
     y = radius * np.sin(theta)
     return gc.Path(x, y, z)
+
 
 full_object = []
 skirt = create_skirt_path()
