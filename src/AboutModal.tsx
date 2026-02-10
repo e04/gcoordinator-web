@@ -32,8 +32,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <section className="space-y-3">
               <h3 className="text-lg font-semibold text-white mb-2">About</h3>
               <p>
-                gcoordinator-web is a G-code generation software for 3D printing that 
-                allows you to create 3D models using Python code.
+                gcoordinator-web is a G-code generation software for 3D printing using Python code.
               </p>
               <p>
                 This is a browser-based frontend of{" "}
@@ -47,8 +46,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 </a>
                 , a Python library created by <strong>tomohiron907</strong>. This web version has been 
                 adapted with reduced dependencies to run entirely in the browser using 
-                Pyodide, making G-code generation accessible without any server-side 
-                installation.
+                Pyodide.
               </p>
             </section>
 

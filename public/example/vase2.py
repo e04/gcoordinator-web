@@ -1,11 +1,58 @@
 import numpy as np
 import gcoordinator as gc
 
-TOTAL_LAYERS = 100
-LAYER_HEIGHT = 0.8
+default_settings = {
+    "Print": {
+        "nozzle": {
+            "nozzle_diameter": 0.8,
+            "filament_diameter": 1.75
+        },
+        "layer": {
+            "layer_height": 0.5
+        },
+        "speed": {
+            "print_speed": 1000,
+            "travel_speed": 5000
+        },
+        "origin": {
+            "x": 90,
+            "y": 90
+        },
+        "fan_speed": {
+            "fan_speed": 128
+        },
+        "temperature": {
+            "nozzle_temperature": 220,
+            "bed_temperature": 50
+        },
+        "travel_option": {
+            "retraction": False,
+            "retraction_distance": 2.0,
+            "unretraction_distance": 2.0,
+            "z_hop": False,
+            "z_hop_distance": 3
+        },
+        "extrusion_option": {
+            "extrusion_multiplier": 1.0
+        }
+    },
+    "Hardware": {
+        "kinematics": "Cartesian",
+        "bed_size": {
+            "bed_size_x": 180,
+            "bed_size_y": 180,
+            "bed_size_z": 180
+        }
+    }
+}
+
+gc.set_settings(default_settings)
+
+TOTAL_LAYERS = 160
+LAYER_HEIGHT = default_settings['Print']['layer']['layer_height']
 BASE_RADIUS = 20
 MAX_RADIUS = 50
-PEAK_LAYER = 50
+PEAK_LAYER = 80
 SMOOTHNESS = 0.4
 WAVE_AMPLITUDE = 1.2
 WAVE_FREQUENCY = 50

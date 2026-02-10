@@ -1,8 +1,8 @@
 import numpy as np
 import gcoordinator as gc
 
-TOTAL_LAYERS = 200
-LAYER_HEIGHT = 0.5
+TOTAL_LAYERS = 100
+LAYER_HEIGHT = 0.8
 BASE_RADIUS = 35
 LAST_RADIUS = 35
 WAVE_AMPLITUDE = 1

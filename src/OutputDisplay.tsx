@@ -14,7 +14,7 @@ import {
 } from "./outputStore";
 
 const LINE_HEIGHT = 20; // pixels per line
-const OVERSCAN = 5; // extra rows to render above/below viewport
+const OVERSCAN = 32; // extra rows to render above/below viewport
 
 function OutputDisplay() {
   const gcode = useSyncExternalStore(subscribe, getGcodeSnapshot);

@@ -24,7 +24,7 @@ export const EXAMPLE_OPTIONS: ExampleKey[] = [
   "vase4",
 ];
 
-export const DEFAULT_EXAMPLE: ExampleKey = "rectangle_wall";
+export const DEFAULT_EXAMPLE: ExampleKey = "vase2";
 
 export async function loadExampleCode(example: ExampleKey): Promise<string> {
   const response = await fetch(EXAMPLE_PATHS[example]);

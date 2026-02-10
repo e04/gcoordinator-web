@@ -12,8 +12,6 @@ import { usePyodideRunner } from "./hooks/usePyodideRunner";
 import { useAutoRun } from "./hooks/useAutoRun";
 import { DEFAULT_EXAMPLE, loadExampleCode } from "./examples";
 
-const INITIAL_EXAMPLE = DEFAULT_EXAMPLE;
-
 function App() {
   const [code, setCode] = useState("");
   const [initialCode, setInitialCode] = useState<string | null>(null);
@@ -38,7 +36,7 @@ function App() {
   useEffect(() => {
     const loadInitial = async () => {
       try {
-        const exampleCode = await loadExampleCode(INITIAL_EXAMPLE);
+        const exampleCode = await loadExampleCode(DEFAULT_EXAMPLE);
         setCode(exampleCode);
         setInitialCode(exampleCode);
       } catch (err) {

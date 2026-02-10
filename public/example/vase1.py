@@ -1,5 +1,6 @@
 import numpy as np
 import gcoordinator as gc
+
 TOTAL_LAYERS = 100
 LAYER_HEIGHT = 1.0
 BASE_RADIUS = 35
@@ -15,6 +16,7 @@ INFILL_DISTANCE = 1.5
 WALL_POINTS_PER_LAYER = 720
 SKIRT_OFFSET = 5
 SKIRT_POINTS = 200
+
 def calculate_radius_at_layer(layer: float) -> float:
     progress = layer / TOTAL_LAYERS
     return BASE_RADIUS + (LAST_RADIUS - BASE_RADIUS) * progress

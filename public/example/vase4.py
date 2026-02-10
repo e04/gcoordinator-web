@@ -1,5 +1,6 @@
 import numpy as np
 import gcoordinator as gc
+
 TOTAL_LAYERS = 80
 LAYER_HEIGHT = 1.0
 BASE_RADIUS = 40

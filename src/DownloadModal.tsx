@@ -11,13 +11,13 @@ const STORAGE_KEY_END = "gcoordinator-end-gcode";
 
 function DownloadModal({ isOpen, onClose, gcode }: DownloadModalProps) {
   const [startGCode, setStartGCode] = useState(
-    () => localStorage.getItem(STORAGE_KEY_START) ?? ""
+    () => localStorage.getItem(STORAGE_KEY_START) ?? "",
   );
   const [endGCode, setEndGCode] = useState(
-    () => localStorage.getItem(STORAGE_KEY_END) ?? ""
+    () => localStorage.getItem(STORAGE_KEY_END) ?? "",
   );
   const [filename, setFilename] = useState(
-    () => `gcoordinator-web-${new Date().toISOString().replace(/:/g, "-")}`
+    () => `gcoordinator-web-${new Date().toISOString().replace(/:/g, "-")}`,
   );
 
   const handleStartBlur = useCallback(() => {
@@ -54,7 +54,7 @@ function DownloadModal({ isOpen, onClose, gcode }: DownloadModalProps) {
         onClose();
       }
     },
-    [onClose]
+    [onClose],
   );
 
   if (!isOpen) return null;
@@ -66,8 +66,7 @@ function DownloadModal({ isOpen, onClose, gcode }: DownloadModalProps) {
     >
       <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 border border-gray-700">
         <h2 className="text-xl font-bold mb-4">Download G-Code</h2>
-
-        <div className="space-y-4">
+        <div className="space-y-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               FILENAME
@@ -104,6 +103,16 @@ function DownloadModal({ isOpen, onClose, gcode }: DownloadModalProps) {
               placeholder="Enter G-code to append at the end..."
               className="w-full h-32 bg-gray-900 border border-gray-600 rounded-lg p-3 text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500"
             />
+          </div>
+        </div>
+
+        <div className="bg-red-950 border-2 border-red-600 rounded py-4 mb-6">
+          <p className="text-red-500 font-bold text-center text-lg tracking-wider">
+            WARNING
+          </p>
+          <div className="text-red-400 text-sm space-y-1 font-semibold text-center mt-2">
+            <p>USE AT YOUR OWN RISK</p>
+            <p>NO WARRANTY OF ANY KIND IS PROVIDED</p>
           </div>
         </div>
 
