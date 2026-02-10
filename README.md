@@ -97,4 +97,9 @@ settings = {
 }
 
 gc.set_settings(settings)
+
+full_object = []
+
+for height in range(100):
+    ...
 ```
