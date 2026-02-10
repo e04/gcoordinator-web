@@ -61,74 +61,80 @@ function DownloadModal({ isOpen, onClose, gcode }: DownloadModalProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 border border-gray-700">
-        <h2 className="text-xl font-bold mb-4">Download G-Code</h2>
-        <div className="space-y-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              FILENAME
-            </label>
+      <div className="w-full max-w-2xl rounded-md border border-gray-700 bg-gray-900 p-4 shadow-xl">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-gray-100">Download G-code</h2>          <button
+            type="button"
+            onClick={onClose}
+            className="text-2xl leading-none text-gray-400 hover:text-white"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-xs text-gray-300">Filename</label>
             <input
               type="text"
               value={filename}
               onChange={(e) => setFilename(e.target.value)}
               placeholder="Enter filename..."
-              className="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white font-mono text-sm focus:outline-none focus:border-blue-500"
+              className="w-full rounded-md border border-gray-600 bg-gray-800 px-2 py-1 font-mono text-sm text-gray-100 transition-colors placeholder:text-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Start G-CODE
-            </label>
+
+          <div className="space-y-1">
+            <label className="text-xs text-gray-300">Start G-code</label>
             <textarea
               value={startGCode}
               onChange={(e) => setStartGCode(e.target.value)}
               onBlur={handleStartBlur}
               placeholder="Enter G-code to prepend at the start..."
-              className="w-full h-32 bg-gray-900 border border-gray-600 rounded-lg p-3 text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500"
+              className="h-32 w-full resize-none rounded-md border border-gray-600 bg-gray-800 px-2 py-1 font-mono text-sm text-gray-100 transition-colors placeholder:text-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              End G-CODE
-            </label>
+          <div className="space-y-1">
+            <label className="text-xs text-gray-300">End G-code</label>
             <textarea
               value={endGCode}
               onChange={(e) => setEndGCode(e.target.value)}
               onBlur={handleEndBlur}
               placeholder="Enter G-code to append at the end..."
-              className="w-full h-32 bg-gray-900 border border-gray-600 rounded-lg p-3 text-white font-mono text-sm resize-none focus:outline-none focus:border-blue-500"
+              className="h-32 w-full resize-none rounded-md border border-gray-600 bg-gray-800 px-2 py-1 font-mono text-sm text-gray-100 transition-colors placeholder:text-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
-        </div>
 
-        <div className="bg-red-950 border-2 border-red-600 rounded py-4 mb-6">
-          <p className="text-red-500 font-bold text-center text-lg tracking-wider">
-            WARNING
-          </p>
-          <div className="text-red-400 text-sm space-y-1 font-semibold text-center mt-2">
-            <p>USE AT YOUR OWN RISK</p>
-            <p>NO WARRANTY OF ANY KIND IS PROVIDED</p>
+          <div className="rounded-md border border-red-700 bg-red-950/40 p-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-300">
+              Warning
+            </p>
+            <div className="mt-1 space-y-1 text-sm text-red-200">
+              <p>Use at your own risk.</p>
+              <p>No warranty of any kind is provided.</p>
+            </div>
           </div>
-        </div>
 
-        <div className="flex justify-end gap-3 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg font-semibold transition-colors bg-gray-600 hover:bg-gray-500"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleDownload}
-            className="px-4 py-2 rounded-lg font-semibold transition-colors bg-blue-600 hover:bg-blue-500"
-          >
-            Download
-          </button>
+          <div className="mt-1 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md border border-gray-600 bg-gray-800 px-3 py-1 text-sm text-gray-200 transition-colors hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="rounded-md border border-blue-500 bg-blue-600 px-3 py-1 text-sm text-white transition-colors hover:bg-blue-500"
+            >
+              Download
+            </button>
+          </div>
         </div>
       </div>
     </div>

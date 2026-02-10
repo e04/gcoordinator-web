@@ -11,6 +11,9 @@ import { usePanelLayout } from "./hooks/usePanelLayout";
 import { usePyodideRunner } from "./hooks/usePyodideRunner";
 import { useAutoRun } from "./hooks/useAutoRun";
 import { DEFAULT_EXAMPLE, loadExampleCode } from "./examples";
+import { Download as DownloadIcon } from "lucide-react";
+
+const CODE_STORAGE_KEY = "savedEditorCode";
 
 function App() {
   const [code, setCode] = useState("");
@@ -35,6 +38,17 @@ function App() {
 
   useEffect(() => {
     const loadInitial = async () => {
+      try {
+        const savedCode = localStorage.getItem(CODE_STORAGE_KEY);
+        if (savedCode !== null) {
+          setCode(savedCode);
+          setInitialCode(savedCode);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to load saved code from localStorage", err);
+      }
+
       try {
         const exampleCode = await loadExampleCode(DEFAULT_EXAMPLE);
         setCode(exampleCode);
@@ -71,6 +85,15 @@ function App() {
   const handleRun = useCallback(() => {
     runCode(code);
   }, [code, runCode]);
+
+  const handleCodeChange = useCallback((value: string) => {
+    setCode(value);
+    try {
+      localStorage.setItem(CODE_STORAGE_KEY, value);
+    } catch (err) {
+      console.error("Failed to save code to localStorage", err);
+    }
+  }, []);
 
   useAutoRun({
     code,
@@ -136,7 +159,7 @@ function App() {
           className="flex flex-col min-h-0"
         >
           <div className="flex-1 min-h-0">
-            <CodeEditor code={code} onChange={setCode} />
+            <CodeEditor code={code} onChange={handleCodeChange} />
           </div>
           <div
             onMouseDown={handleConsoleDragStart}
@@ -165,14 +188,16 @@ function App() {
               <button
                 type="button"
                 onClick={handleOpenModal}
-                className="px-2 py-0.5 text-sm border-1 border-blue-600 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                aria-label="Download gcode"
+                title="Download gcode"
+                className="p-1.5 border border-emerald-500/60 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white transition-colors inline-flex items-center justify-center"
               >
-                Download...
+                <DownloadIcon className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           </div>
           {(isLoading || isRunning) && (
-            <div className="absolute top-8 left-0 right-0 h-1 z-30 overflow-hidden bg-gray-700">
+            <div className="absolute top-9 left-0 right-0 h-1 z-30 overflow-hidden bg-gray-700">
               <div className="h-full w-1/3 bg-blue-500 animate-[loading-bar_1s_ease-in-out_infinite]" />
             </div>
           )}
@@ -188,14 +213,13 @@ function App() {
             style={{ top: `${outputHeight}px` }}
             className="absolute left-0 right-0 h-1 bg-gray-700 hover:bg-blue-500 cursor-row-resize transition-colors z-20"
           />
+          <DownloadModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            gcode={gcode}
+          />
         </div>
       </div>
-
-      <DownloadModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        gcode={gcode}
-      />
       <AboutModal
         isOpen={isAboutModalOpen}
         onClose={() => setIsAboutModalOpen(false)}

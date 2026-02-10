@@ -18,7 +18,9 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
         <div className="py-6 px-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-bold text-white">gcoordinator-web</h2>
+              <h2 className="text-2xl font-bold text-white">
+                gcoordinator-web
+              </h2>
             </div>
             <button
               onClick={onClose}
@@ -32,7 +34,8 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <section className="space-y-3">
               <h3 className="text-lg font-semibold text-white mb-2">About</h3>
               <p>
-                gcoordinator-web is a G-code generation software for 3D printing using Python code.
+                gcoordinator-web is a G-code generation software for 3D printing
+                using Python code.
               </p>
               <p>
                 This is a browser-based frontend of{" "}
@@ -44,9 +47,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 >
                   gcoordinator
                 </a>
-                , a Python library created by <strong>tomohiron907</strong>. This web version has been 
-                adapted with reduced dependencies to run entirely in the browser using 
-                Pyodide.
+                , a Python library created by <strong>tomohiron907</strong>.
               </p>
             </section>
 
@@ -64,7 +65,19 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 </a>
                 .
               </p>
-                            <p>
+              <p>
+                <strong>gcoordinator-lite</strong> © 2026 e04{" "}
+                <a
+                  href="https://github.com/e04/gcoordinator-lite"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline"
+                >
+                  MIT License
+                </a>
+                .
+              </p>
+              <p>
                 <strong>gcoordinator-web</strong> © 2026 e04{" "}
                 <a
                   href="https://opensource.org/licenses/MIT"
