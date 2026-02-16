@@ -4,7 +4,7 @@ A browser-based G-code generation tool for 3D printing, powered by gcoordinator.
 
 **Live demo:** https://e04.github.io/gcoordinator-web/
 
-<img width="1508" height="1009" src="https://github.com/user-attachments/assets/f3679619-a5e5-43c4-9556-7324d8a8955a" />
+<img width="1508" height="1009" alt="gcoordinator-web screenshot" src="https://github.com/user-attachments/assets/104ffffb-80d4-4795-afcf-7896265df852" />
 
 ## What is gcoordinator-web?
 
@@ -97,4 +97,9 @@ settings = {
 }
 
 gc.set_settings(settings)
+
+full_object = []
+
+for height in range(100):
+    ...
 ```
