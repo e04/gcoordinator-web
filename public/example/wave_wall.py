@@ -5,10 +5,10 @@ default_settings = {
     "Print": {
         "nozzle": {"nozzle_diameter": 1.2, "filament_diameter": 1.75},
         "layer": {"layer_height": 1.0},
-        "speed": {"print_speed": 300, "travel_speed": 5000},
+        "speed": {"print_speed": 100, "travel_speed": 5000},
         "origin": {"x": 90, "y": 90},
         "fan_speed": {"fan_speed": 0},
-        "temperature": {"nozzle_temperature": 250, "bed_temperature": 75},
+        "temperature": {"nozzle_temperature": 270, "bed_temperature": 80},
         "travel_option": {
             "retraction": False,
             "retraction_distance": 2.0,
@@ -16,7 +16,7 @@ default_settings = {
             "z_hop": False,
             "z_hop_distance": 3,
         },
-        "extrusion_option": {"extrusion_multiplier": 1.0},
+        "extrusion_option": {"extrusion_multiplier": 1.5},
     },
     "Hardware": {
         "kinematics": "Cartesian",
@@ -26,18 +26,23 @@ default_settings = {
 
 gc.set_settings(default_settings)
 
-TOTAL_LAYERS = 28
-LAYER_HEIGHT = 1.0
-BASE_WIDTH = 40
-BASE_DEPTH = 24
-LAST_WIDTH = 40
-LAST_DEPTH = 24
+TOTAL_LAYERS = 100
+LAYER_HEIGHT = default_settings["Print"]["layer"]["layer_height"]
+BASE_WIDTH = 50
+BASE_DEPTH = 5
+LAST_WIDTH = 50
+LAST_DEPTH = 5
 BOTTOM_LAYERS = 1
 INFILL_DISTANCE = 1.2
 BOTTOM_INSET = 0
-WALL_POINTS_PER_SIDE = 2
+WALL_POINTS_PER_SIDE = 120
 SKIRT_OFFSET = 5
 SKIRT_POINTS = 200
+WAVE_AMPLITUDE = 3
+WAVE_COUNT = 2
+WAVE_VERTICAL_CYCLES = 2
+WAVE_SECONDARY_RATIO = 1
+WAVE_MAX_RATIO_TO_DEPTH = 0.8
 
 
 def calculate_size_at_layer(layer: float) -> tuple:
@@ -70,36 +75,17 @@ def create_rect_path(
     return x, y, z
 
 
-def create_skirt_path() -> gc.Path:
-    width, depth = calculate_wall_start_size()
-    width += SKIRT_OFFSET
-    depth += SKIRT_OFFSET
-    points_per_side = SKIRT_POINTS // 4
-    x, y, z = create_rect_path(width, depth, LAYER_HEIGHT, points_per_side)
-    return gc.Path(x, y, z)
-
-
-def create_zigzag_bottom() -> gc.Path:
-    max_width, max_depth = calculate_wall_start_size()
-    max_width -= BOTTOM_INSET
-    max_depth -= BOTTOM_INSET
-    num_lines = int(2 * max_width / INFILL_DISTANCE) + 1
-    x_list = []
-    y_list = []
-    for i in range(num_lines):
-        x_pos = -max_width + i * INFILL_DISTANCE
-        if x_pos > max_width:
-            x_pos = max_width
-        if i % 2 == 0:
-            x_list.extend([x_pos, x_pos])
-            y_list.extend([-max_depth, max_depth])
-        else:
-            x_list.extend([x_pos, x_pos])
-            y_list.extend([max_depth, -max_depth])
-    x = np.array(x_list)
-    y = np.array(y_list)
-    z = np.full_like(x, LAYER_HEIGHT)
-    return gc.Path(x, y, z)
+def calculate_wave_offset(
+    t: np.ndarray, z: np.ndarray, depth: np.ndarray
+) -> np.ndarray:
+    z_ratio = z / (TOTAL_LAYERS * LAYER_HEIGHT)
+    primary = np.sin(2 * np.pi * (WAVE_COUNT * t + WAVE_VERTICAL_CYCLES * z_ratio))
+    secondary = np.sin(
+        2 * np.pi * (2.2 * WAVE_COUNT * t - 0.5 * WAVE_VERTICAL_CYCLES * z_ratio + 0.25)
+    )
+    edge_fade = np.sin(np.pi * t)
+    amplitude = np.minimum(WAVE_AMPLITUDE, depth * WAVE_MAX_RATIO_TO_DEPTH)
+    return amplitude * edge_fade * (primary + WAVE_SECONDARY_RATIO * secondary)
 
 
 def create_continuous_wall() -> gc.Path:
@@ -132,7 +118,7 @@ def create_continuous_wall() -> gc.Path:
                 y = depth * (1 - 2 * t)
             else:
                 x = width * (2 * t - 1)
-                y = -depth
+                y = -depth - calculate_wave_offset(t, z, depth)
             x_list.append(x)
             y_list.append(y)
             z_list.append(z)
@@ -143,9 +129,5 @@ def create_continuous_wall() -> gc.Path:
 
 
 full_object = []
-skirt = create_skirt_path()
-full_object.append(skirt)
-bottom = create_zigzag_bottom()
-full_object.append(bottom)
 wall = create_continuous_wall()
 full_object.append(wall)
