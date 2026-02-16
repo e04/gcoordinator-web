@@ -29,16 +29,21 @@ gc.set_settings(default_settings)
 TOTAL_LAYERS = 100
 LAYER_HEIGHT = default_settings["Print"]["layer"]["layer_height"]
 BASE_WIDTH = 50
-BASE_DEPTH = 6
+BASE_DEPTH = 5
 LAST_WIDTH = 50
-LAST_DEPTH = 6
+LAST_DEPTH = 5
 BOTTOM_LAYERS = 1
 INFILL_DISTANCE = 1.2
 BOTTOM_INSET = 0
 WALL_POINTS_PER_SIDE = 120
 
-SPHERE_RADIUS = 100
-SPHERE_DISTANCE = 90
+RIPPLE_AMPLITUDE = 10.0
+RIPPLE_WAVELENGTH = 10.0
+RIPPLE_DAMPING = 0.03
+RIPPLE_CENTER_X = 0.0
+RIPPLE_CENTER_Z_RATIO = 0.5
+RIPPLE_MAX_RATIO_TO_DEPTH = 5
+RIPPLE_MIN_RADIUS = 4.0
 
 
 def calculate_size_at_layer(layer: float) -> tuple:
@@ -71,28 +76,28 @@ def create_rect_path(
     return x, y, z
 
 
-def calculate_sphere_offset(
+def calculate_ripple_offset(
     x: np.ndarray, z: np.ndarray, depth: np.ndarray
 ) -> np.ndarray:
     wall_height = TOTAL_LAYERS * LAYER_HEIGHT
-    sphere_center_x = 0.0
-    sphere_center_y = depth + SPHERE_DISTANCE
-    sphere_center_z = wall_height / 2.0
+    center_z = wall_height * RIPPLE_CENTER_Z_RATIO
 
-    dx = x - sphere_center_x
-    dz = z - sphere_center_z
-    dist_xz = np.sqrt(dx**2 + dz**2)
+    dx = x - RIPPLE_CENTER_X
+    dz = z - center_z
+    r = np.sqrt(dx**2 + dz**2)
 
-    offset = np.zeros_like(x)
-    inside = dist_xz < SPHERE_RADIUS
-    if np.any(inside):
-        sphere_surface_y = np.sqrt(
-            np.maximum(SPHERE_RADIUS**2 - dist_xz[inside] ** 2, 0)
-        )
-        penetration = sphere_surface_y - SPHERE_DISTANCE
-        offset[inside] = -np.maximum(penetration, 0)
+    r_eff = np.maximum(r, RIPPLE_MIN_RADIUS)
 
-    return offset
+    k = 2.0 * np.pi / RIPPLE_WAVELENGTH
+
+    geometric_decay = 1.0 / np.sqrt(r_eff)
+    viscous_decay = np.exp(-RIPPLE_DAMPING * r_eff)
+    wave = np.cos(k * r_eff)
+
+    raw_offset = RIPPLE_AMPLITUDE * geometric_decay * viscous_decay * wave
+
+    amplitude_cap = depth * RIPPLE_MAX_RATIO_TO_DEPTH
+    return np.clip(raw_offset, -amplitude_cap, amplitude_cap)
 
 
 def create_continuous_wall() -> gc.Path:
@@ -125,7 +130,7 @@ def create_continuous_wall() -> gc.Path:
                 y = depth * (1 - 2 * t)
             else:
                 x = width * (2 * t - 1)
-                y = -depth - calculate_sphere_offset(x, z, depth)
+                y = -depth - calculate_ripple_offset(x, z, depth)
             x_list.append(x)
             y_list.append(y)
             z_list.append(z)

@@ -10,6 +10,7 @@ export const EXAMPLE_PATHS = {
   vase4: "/gcoordinator-web/example/vase4.py",
   wave_wall: "/gcoordinator-web/example/wave_wall.py",
   sphere_wall: "/gcoordinator-web/example/sphere_wall.py",
+  ripple_wall: "/gcoordinator-web/example/ripple_wall.py",
 } as const;
 
 export type ExampleKey = keyof typeof EXAMPLE_PATHS;
@@ -26,6 +27,7 @@ export const EXAMPLE_OPTIONS: ExampleKey[] = [
   "vase4",
   "wave_wall",
   "sphere_wall",
+  "ripple_wall",
 ];
 
 export const DEFAULT_EXAMPLE: ExampleKey = "vase2";

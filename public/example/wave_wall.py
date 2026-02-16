@@ -36,13 +36,14 @@ BOTTOM_LAYERS = 1
 INFILL_DISTANCE = 1.2
 BOTTOM_INSET = 0
 WALL_POINTS_PER_SIDE = 120
-SKIRT_OFFSET = 5
-SKIRT_POINTS = 200
-WAVE_AMPLITUDE = 3
-WAVE_COUNT = 2
-WAVE_VERTICAL_CYCLES = 2
-WAVE_SECONDARY_RATIO = 1
-WAVE_MAX_RATIO_TO_DEPTH = 0.8
+
+RIPPLE_AMPLITUDE = 10.0
+RIPPLE_WAVELENGTH = 10.0
+RIPPLE_DAMPING = 0.03
+RIPPLE_CENTER_X = 0.0
+RIPPLE_CENTER_Z_RATIO = 0.5
+RIPPLE_MAX_RATIO_TO_DEPTH = 5
+RIPPLE_MIN_RADIUS = 4.0
 
 
 def calculate_size_at_layer(layer: float) -> tuple:
@@ -75,17 +76,44 @@ def create_rect_path(
     return x, y, z
 
 
-def calculate_wave_offset(
-    t: np.ndarray, z: np.ndarray, depth: np.ndarray
+def calculate_ripple_offset(
+    x: np.ndarray, z: np.ndarray, depth: np.ndarray
 ) -> np.ndarray:
-    z_ratio = z / (TOTAL_LAYERS * LAYER_HEIGHT)
-    primary = np.sin(2 * np.pi * (WAVE_COUNT * t + WAVE_VERTICAL_CYCLES * z_ratio))
-    secondary = np.sin(
-        2 * np.pi * (2.2 * WAVE_COUNT * t - 0.5 * WAVE_VERTICAL_CYCLES * z_ratio + 0.25)
-    )
-    edge_fade = np.sin(np.pi * t)
-    amplitude = np.minimum(WAVE_AMPLITUDE, depth * WAVE_MAX_RATIO_TO_DEPTH)
-    return amplitude * edge_fade * (primary + WAVE_SECONDARY_RATIO * secondary)
+    """壁面上の各点における波紋（リップル）のオフセットを計算する。
+
+    物理モデル:
+      水面に物体を落としたときの円形波を2D波動方程式の定常解として近似する。
+      遠方場では、2次元における円筒波のエネルギー保存則 (E ∝ 1/r) から
+      振幅は 1/√r に比例して減衰する。さらに粘性散逸による指数関数的減衰
+      exp(-αr) を乗じることで、より物理的に妥当なパターンを得る。
+
+      η(r) = A / √(r) * exp(-α * r) * cos(k * r)
+
+      ここで:
+        r   = 波紋中心からの距離
+        k   = 2π / λ  (波数)
+        α   = RIPPLE_DAMPING  (粘性減衰係数)
+        A   = RIPPLE_AMPLITUDE
+    """
+    wall_height = TOTAL_LAYERS * LAYER_HEIGHT
+    center_z = wall_height * RIPPLE_CENTER_Z_RATIO
+
+    dx = x - RIPPLE_CENTER_X
+    dz = z - center_z
+    r = np.sqrt(dx**2 + dz**2)
+
+    r_eff = np.maximum(r, RIPPLE_MIN_RADIUS)
+
+    k = 2.0 * np.pi / RIPPLE_WAVELENGTH
+
+    geometric_decay = 1.0 / np.sqrt(r_eff)
+    viscous_decay = np.exp(-RIPPLE_DAMPING * r_eff)
+    wave = np.cos(k * r_eff)
+
+    raw_offset = RIPPLE_AMPLITUDE * geometric_decay * viscous_decay * wave
+
+    amplitude_cap = depth * RIPPLE_MAX_RATIO_TO_DEPTH
+    return np.clip(raw_offset, -amplitude_cap, amplitude_cap)
 
 
 def create_continuous_wall() -> gc.Path:
@@ -118,7 +146,7 @@ def create_continuous_wall() -> gc.Path:
                 y = depth * (1 - 2 * t)
             else:
                 x = width * (2 * t - 1)
-                y = -depth - calculate_wave_offset(t, z, depth)
+                y = -depth - calculate_ripple_offset(x, z, depth)
             x_list.append(x)
             y_list.append(y)
             z_list.append(z)
