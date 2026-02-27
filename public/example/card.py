@@ -5,7 +5,7 @@ default_settings = {
     "Print": {
         "nozzle": {"nozzle_diameter": 1.2, "filament_diameter": 1.75},
         "layer": {"layer_height": 1.0},
-        "speed": {"print_speed": 300, "travel_speed": 5000},
+        "speed": {"print_speed": 200, "travel_speed": 5000},
         "origin": {"x": 90, "y": 90},
         "fan_speed": {"fan_speed": 0},
         "temperature": {"nozzle_temperature": 270, "bed_temperature": 80},
@@ -26,19 +26,28 @@ default_settings = {
 
 gc.set_settings(default_settings)
 
-TOTAL_LAYERS = 100
+TOTAL_LAYERS = 96
 LAYER_HEIGHT = default_settings["Print"]["layer"]["layer_height"]
-BASE_WIDTH = 50
-BASE_DEPTH = 6
-LAST_WIDTH = 50
-LAST_DEPTH = 6
+BASE_WIDTH = 29.5
+BASE_DEPTH = 2.5
+LAST_WIDTH = 29.5
+LAST_DEPTH = 2.5
 BOTTOM_LAYERS = 1
-INFILL_DISTANCE = 1.2
+INFILL_DISTANCE = 1.5
 BOTTOM_INSET = 0
 WALL_POINTS_PER_SIDE = 120
 
-SPHERE_RADIUS = 100
-SPHERE_DISTANCE = 90
+RIPPLE_WAVELENGTH = 5.0
+RIPPLE_DAMPING = 0.03
+RIPPLE_MAX_RATIO_TO_DEPTH = 5
+RIPPLE_MIN_RADIUS = 1
+
+RIPPLE_SOURCES = [
+    {"center_x": -8.0, "center_z_ratio": 0.35, "amplitude": 1.0},
+    {"center_x": 6.0, "center_z_ratio": 0.65, "amplitude": 0.8},
+    {"center_x": -2.0, "center_z_ratio": 0.80, "amplitude": 0.6},
+    {"center_x": 12.0, "center_z_ratio": 0.25, "amplitude": 0.7},
+]
 
 
 def calculate_size_at_layer(layer: float) -> tuple:
@@ -71,28 +80,66 @@ def create_rect_path(
     return x, y, z
 
 
-def calculate_sphere_offset(
+def calculate_ripple_offset(
     x: np.ndarray, z: np.ndarray, depth: np.ndarray
 ) -> np.ndarray:
     wall_height = TOTAL_LAYERS * LAYER_HEIGHT
-    sphere_center_x = 0.0
-    sphere_center_y = depth + SPHERE_DISTANCE
-    sphere_center_z = wall_height / 2.0
+    k = 2.0 * np.pi / RIPPLE_WAVELENGTH
 
-    dx = x - sphere_center_x
-    dz = z - sphere_center_z
-    dist_xz = np.sqrt(dx**2 + dz**2)
+    total_offset = np.zeros_like(x)
 
-    offset = np.zeros_like(x)
-    inside = dist_xz < SPHERE_RADIUS
-    if np.any(inside):
-        sphere_surface_y = np.sqrt(
-            np.maximum(SPHERE_RADIUS**2 - dist_xz[inside] ** 2, 0)
-        )
-        penetration = sphere_surface_y - SPHERE_DISTANCE
-        offset[inside] = -np.maximum(penetration, 0)
+    for src in RIPPLE_SOURCES:
+        center_x = src["center_x"]
+        center_z = wall_height * src["center_z_ratio"]
+        amplitude = src["amplitude"]
 
-    return offset
+        dx = x - center_x
+        dz = z - center_z
+        r = np.sqrt(dx**2 + dz**2)
+        r_eff = np.maximum(r, RIPPLE_MIN_RADIUS)
+
+        geometric_decay = 1.0 / np.sqrt(r_eff)
+        viscous_decay = np.exp(-RIPPLE_DAMPING * r_eff)
+        wave = np.cos(k * r_eff)
+
+        total_offset += amplitude * geometric_decay * viscous_decay * wave
+
+    amplitude_cap = depth * RIPPLE_MAX_RATIO_TO_DEPTH
+    return np.clip(total_offset, -amplitude_cap, amplitude_cap)
+
+
+def create_bottom() -> gc.Path:
+    width, depth = calculate_size_at_layer(0)
+    width -= BOTTOM_INSET
+    depth -= BOTTOM_INSET
+
+    x_list = []
+    y_list = []
+    z_list = []
+
+    for layer_i in range(BOTTOM_LAYERS):
+        z_height = (layer_i + 1) * LAYER_HEIGHT
+
+        num_lines = int(2 * depth / INFILL_DISTANCE)
+        for i in range(num_lines + 1):
+            y_pos = -depth + i * INFILL_DISTANCE
+            if y_pos > depth:
+                y_pos = depth
+            n_pts = max(int(2 * width / INFILL_DISTANCE * 2), 10)
+            if i % 2 == 0:
+                xs = np.linspace(-width, width, n_pts)
+            else:
+                xs = np.linspace(width, -width, n_pts)
+            ys = np.full(n_pts, y_pos)
+            zs = np.full(n_pts, z_height)
+            x_list.append(xs)
+            y_list.append(ys)
+            z_list.append(zs)
+
+    x = np.concatenate(x_list)
+    y = np.concatenate(y_list)
+    z = np.concatenate(z_list)
+    return gc.Path(x, y, z)
 
 
 def create_continuous_wall() -> gc.Path:
@@ -117,15 +164,23 @@ def create_continuous_wall() -> gc.Path:
             if side == 0:
                 x = width
                 y = depth * (2 * t - 1)
+                offset = calculate_ripple_offset(x, z, depth)
+                x = x + offset
             elif side == 1:
                 x = width * (1 - 2 * t)
                 y = depth
+                offset = calculate_ripple_offset(x, z, depth)
+                y = y + offset
             elif side == 2:
                 x = -width
                 y = depth * (1 - 2 * t)
+                offset = calculate_ripple_offset(x, z, depth)
+                x = x - offset
             else:
                 x = width * (2 * t - 1)
-                y = -depth - calculate_sphere_offset(x, z, depth)
+                y = -depth
+                offset = calculate_ripple_offset(x, z, depth)
+                y = y - offset
             x_list.append(x)
             y_list.append(y)
             z_list.append(z)
@@ -136,5 +191,7 @@ def create_continuous_wall() -> gc.Path:
 
 
 full_object = []
+bottom = create_bottom()
+full_object.append(bottom)
 wall = create_continuous_wall()
 full_object.append(wall)

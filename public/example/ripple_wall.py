@@ -5,7 +5,7 @@ default_settings = {
     "Print": {
         "nozzle": {"nozzle_diameter": 1.2, "filament_diameter": 1.75},
         "layer": {"layer_height": 1.0},
-        "speed": {"print_speed": 100, "travel_speed": 5000},
+        "speed": {"print_speed": 300, "travel_speed": 5000},
         "origin": {"x": 90, "y": 90},
         "fan_speed": {"fan_speed": 0},
         "temperature": {"nozzle_temperature": 270, "bed_temperature": 80},
